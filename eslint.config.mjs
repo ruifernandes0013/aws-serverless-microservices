@@ -23,6 +23,7 @@ export default defineConfig([
     extends: ["js/recommended"],
     rules: {
       "max-len": ["error", { code: 80, ignoreUrls: true }],
+      "comma-dangle": ["error", "never"],
     },
   },
   tseslint.configs.recommended,

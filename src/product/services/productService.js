@@ -5,14 +5,14 @@ import {
   GetItemCommand,
   PutItemCommand,
   ScanCommand,
-  UpdateItemCommand,
+  UpdateItemCommand
 } from "@aws-sdk/client-dynamodb";
 import { uuid } from "uuidv4";
 
 export async function getProduct(id) {
   const input = {
     TableName: process.env.DYNAMODB_TABLE_NAME,
-    Key: marshall({ id }),
+    Key: marshall({ id })
   };
 
   const { Item } = await ddbClient.send(new GetItemCommand(input));
@@ -22,7 +22,7 @@ export async function getProduct(id) {
 
 export async function getAllProducts() {
   const input = {
-    TableName: process.env.DYNAMODB_TABLE_NAME,
+    TableName: process.env.DYNAMODB_TABLE_NAME
   };
 
   const { Items } = await ddbClient.send(new ScanCommand(input));
@@ -35,8 +35,8 @@ export async function createProduct(product) {
     TableName: process.env.DYNAMODB_TABLE_NAME,
     Item: marshall({
       id: uuid(),
-      ...product,
-    }),
+      ...product
+    })
   };
 
   await ddbClient.send(new PutItemCommand(input));
@@ -52,12 +52,12 @@ export async function updateProduct({ id, product }) {
     ExpressionAttributeValues: {
       ":brand": marshall(product.brand),
       ":price": marshall(product.price),
-      ":name": marshall(product.name),
+      ":name": marshall(product.name)
     },
     ExpressionAttributeNames: {
-      "#productName": "name",
+      "#productName": "name"
     },
-    ReturnValues: "ALL_NEW",
+    ReturnValues: "ALL_NEW"
   };
 
   const { Attributes } = await ddbClient.send(new UpdateItemCommand(input));
@@ -67,7 +67,7 @@ export async function updateProduct({ id, product }) {
 export async function deleteProduct(id) {
   const input = {
     TableName: process.env.DYNAMODB_TABLE_NAME,
-    Key: marshall({ id }),
+    Key: marshall({ id })
   };
 
   await ddbClient.send(new DeleteItemCommand(input));
