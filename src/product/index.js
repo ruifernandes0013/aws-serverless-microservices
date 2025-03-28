@@ -3,7 +3,7 @@ import {
   getAllProductsController,
   createProductController,
   updateProductController,
-  deleteProductController,
+  deleteProductController
 } from "./controllers/productController";
 
 import * as responseHandler from "./utils/responseHandler";
@@ -23,7 +23,7 @@ exports.handler = async function (event) {
       case "PUT":
         return await updateProductController({
           id: event.pathParameters.id,
-          product: JSON.parse(event.body),
+          product: JSON.parse(event.body)
         });
       case "DELETE":
         return await deleteProductController(event.pathParameters.id);
