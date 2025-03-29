@@ -80,6 +80,7 @@ export class SwnMicroservice extends Construct {
       },
       environment: {
         PRIMARY_KEY: "username",
+        DYNAMODB_TABLE_NAME: basketTable.tableName,
         SOURCE: "com.swn.basket.checkoutBasket",
         DETAIL_TYPE: 'CheckoutBasket',
         EVENT_BUS_NAME: 'SwnEventBus'
