@@ -1,28 +1,26 @@
-import { LambdaRestApi } from "aws-cdk-lib/aws-apigateway";
-import {
-  NodejsFunction
-} from "aws-cdk-lib/aws-lambda-nodejs";
+import { IRestApi, LambdaRestApi } from "aws-cdk-lib/aws-apigateway";
+import { IFunction } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 
 interface SwnApiGatewayProps {
-  productFunction: NodejsFunction;
-  basketFunction: NodejsFunction;
+  productFunction: IFunction;
+  basketFunction: IFunction;
 }
 
 interface ApiGateways {
-  productApiGateway: LambdaRestApi;
-  basketApiGateway: LambdaRestApi;
+  productApiGateway: IRestApi;
+  basketApiGateway: IRestApi;
 }
 
 export class SwnApiGateway extends Construct {
 
   // product api 
   private readonly productApiGatewayName = 'Product API';
-  public readonly productApiGateway: LambdaRestApi;
+  public readonly productApiGateway: IRestApi;
 
   // basket api 
   private readonly basketApiGatewayName = 'Basket API';
-  public readonly basketApiGateway: LambdaRestApi;
+  public readonly basketApiGateway: IRestApi;
 
   constructor(scope: Construct, id: string, props: SwnApiGatewayProps) {
     super(scope, id);
@@ -41,8 +39,8 @@ export class SwnApiGateway extends Construct {
   }
 
   private createProductApiGateway(
-    productFunction: NodejsFunction
-  ): LambdaRestApi {
+    productFunction: IFunction
+  ): IRestApi {
     // product
     // GET /product
     // POST /product
@@ -75,8 +73,8 @@ export class SwnApiGateway extends Construct {
   }
 
   private createBasketApiGateway(
-    basketFunction: NodejsFunction
-  ): LambdaRestApi {
+    basketFunction: IFunction
+  ): IRestApi {
     // basket
     // GET /basket
     // POST /basket

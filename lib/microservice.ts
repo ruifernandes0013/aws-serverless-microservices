@@ -1,5 +1,5 @@
 import { ITable } from "aws-cdk-lib/aws-dynamodb";
-import { Runtime } from "aws-cdk-lib/aws-lambda";
+import { IFunction, Runtime } from "aws-cdk-lib/aws-lambda";
 import {
   NodejsFunction,
   NodejsFunctionProps
@@ -13,19 +13,19 @@ interface SwnMicroserviceProps {
 }
 
 interface Microservices {
-  productFunction: NodejsFunction;
-  basketFunction: NodejsFunction;
+  productFunction: IFunction;
+  basketFunction: IFunction;
 }
 
 export class SwnMicroservice extends Construct {
 
   // product microservice 
   private readonly productFunctionName = 'productLambdaFunction';
-  public readonly productFunction: NodejsFunction;
+  public readonly productFunction: IFunction;
   
   // basket microservice 
   private readonly basketFunctionName = 'basketLambdaFunction';
-  public readonly basketFunction: NodejsFunction;
+  public readonly basketFunction: IFunction;
 
   constructor(scope: Construct, id: string, props: SwnMicroserviceProps) {
     super(scope, id);
@@ -43,7 +43,7 @@ export class SwnMicroservice extends Construct {
     };
 }
 
-  private createProductMicroservice(productTable: ITable): NodejsFunction {
+  private createProductMicroservice(productTable: ITable): IFunction {
     const nodeJsFunctionProps: NodejsFunctionProps = {
       bundling: {
         externalModules: ["aws-sdk"]
@@ -65,7 +65,7 @@ export class SwnMicroservice extends Construct {
     return productFunction
   }
 
-  private createBasketMicroservice(basketTable: ITable): NodejsFunction {
+  private createBasketMicroservice(basketTable: ITable): IFunction {
     const nodeJsFunctionProps: NodejsFunctionProps = {
       bundling: {
         externalModules: ["aws-sdk"]
