@@ -6,25 +6,44 @@ import { Construct } from "constructs";
 
 interface SwnApiGatewayProps {
   productFunction: NodejsFunction;
+  basketFunction: NodejsFunction;
 }
 
 interface ApiGateways {
   productApiGateway: LambdaRestApi;
+  basketApiGateway: LambdaRestApi;
 }
 
 export class SwnApiGateway extends Construct {
+
+  // product api 
+  private readonly productApiGatewayName = 'Product API';
   public readonly productApiGateway: LambdaRestApi;
+
+  // basket api 
+  private readonly basketApiGatewayName = 'Basket API';
+  public readonly basketApiGateway: LambdaRestApi;
 
   constructor(scope: Construct, id: string, props: SwnApiGatewayProps) {
     super(scope, id);
 
-    ({ productApiGateway: this.productApiGateway } =
-      this.createApiGateways(props));
+    ({ 
+      productApiGateway: this.productApiGateway,
+      basketApiGateway: this.basketApiGateway 
+    } = this.createApiGateways(props));
   }
 
-  createApiGateways(props: SwnApiGatewayProps): ApiGateways {
-    const { productFunction } = props;
-  // product
+  private createApiGateways(props: SwnApiGatewayProps): ApiGateways {
+    return {
+      productApiGateway: this.createProductApiGateway(props.productFunction),
+      basketApiGateway: this.createBasketApiGateway(props.basketFunction)
+    };
+  }
+
+  private createProductApiGateway(
+    productFunction: NodejsFunction
+  ): LambdaRestApi {
+    // product
     // GET /product
     // POST /product
 
@@ -33,11 +52,15 @@ export class SwnApiGateway extends Construct {
     // PUT /product/{id}
     // DELETE /product/{id}
 
-    const productApiGateway = new LambdaRestApi(this, "productApiGateway", {
-      restApiName: "Product Service",
-      handler: productFunction,
-      proxy: false
-    });
+    const productApiGateway = new LambdaRestApi(
+      this, 
+      this.productApiGatewayName, 
+      {
+        restApiName: this.productApiGatewayName,
+        handler: productFunction,
+        proxy: false
+      }
+    );
 
     const productsResource = productApiGateway.root.addResource("product");
     productsResource.addMethod("GET"); // GET /product
@@ -48,8 +71,43 @@ export class SwnApiGateway extends Construct {
     productResource.addMethod("PUT"); // PUT /product/{id}
     productResource.addMethod("DELETE"); // DELETE /product/{id}
 
-    return {
-      productApiGateway
-    };
+    return productApiGateway
+  }
+
+  private createBasketApiGateway(
+    basketFunction: NodejsFunction
+  ): LambdaRestApi {
+    // basket
+    // GET /basket
+    // POST /basket
+
+    // basket/{username}
+    // GET basket/{username}
+    // DELETE basket/{username}
+
+    // POST basket/checkout
+
+    const basketApiGateway = new LambdaRestApi(
+      this, 
+      this.basketApiGatewayName, 
+      {
+        restApiName: this.basketApiGatewayName,
+        handler: basketFunction,
+        proxy: false
+      }
+    );
+
+    const basketsResource = basketApiGateway.root.addResource("basket");
+    basketsResource.addMethod("GET"); // GET /product
+    basketsResource.addMethod("POST"); // POST /product
+
+    const basketResource = basketsResource.addResource("{username}");
+    basketResource.addMethod("GET"); // GET basket/{username}
+    basketResource.addMethod("DELETE"); // DELETE basket/{username}
+
+    const basketCheckoutResource = basketsResource.addResource("checkout");
+    basketCheckoutResource.addMethod("POST"); // POST basket/checkout
+    
+    return basketApiGateway
   }
 }

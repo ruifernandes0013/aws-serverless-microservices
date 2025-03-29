@@ -8,14 +8,21 @@ export class AwsMicroservicesStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const { productTable } = new SwnDatabase(this, "Database");
+    const { 
+      productTable, 
+      basketTable 
+    } = new SwnDatabase(this, "Database");
 
-    const { productFunction } = new SwnMicroservice(this, "Microservices", {
-      productTable
+    const { 
+      productFunction, 
+      basketFunction
+    } = new SwnMicroservice(this, "Microservices", {
+      productTable, basketTable
     }); 
 
     new SwnApiGateway(this, 'ApiGateways', {
-      productFunction
+      productFunction,
+      basketFunction
     })
   }
 }
