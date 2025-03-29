@@ -9,7 +9,8 @@ import { Construct } from "constructs";
 
 interface Tables {
   productTable: ITable;
-  basketTable: ITable
+  basketTable: ITable;
+  orderTable: ITable;
 }
 
 export class SwnDatabase extends Construct {
@@ -22,19 +23,25 @@ export class SwnDatabase extends Construct {
   private readonly basketTableName = 'basket';
   public readonly basketTable: ITable;
 
+  // order table 
+  private readonly orderTableName = 'order';
+  public readonly orderTable: ITable;
+
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
     ({ 
       productTable: this.productTable,
-      basketTable: this.basketTable 
+      basketTable: this.basketTable,
+      orderTable: this.orderTable
     } = this.createTables());
   }
 
   private createTables(): Tables {
     return {
       productTable: this.createProductTable(),
-      basketTable: this.createBasketTable()
+      basketTable: this.createBasketTable(),
+      orderTable: this.createOrderTable()
     };
   }
 
@@ -52,12 +59,29 @@ export class SwnDatabase extends Construct {
     });
   }
 
-
   private createBasketTable(): ITable {
     return new Table(this, this.basketTableName, {
       tableName: this.basketTableName,
       partitionKey: {
         name: "username",
+        type: AttributeType.STRING
+      },
+      billingMode: BillingMode.PROVISIONED,
+      readCapacity: 5,
+      writeCapacity: 10,
+      removalPolicy: cdk.RemovalPolicy.DESTROY
+    });
+  }
+
+  private createOrderTable(): ITable {
+    return new Table(this, this.orderTableName, {
+      tableName: this.orderTableName,
+      partitionKey: {
+        name: "username",
+        type: AttributeType.STRING
+      },
+      sortKey: {
+        name: 'orderDate',
         type: AttributeType.STRING
       },
       billingMode: BillingMode.PROVISIONED,

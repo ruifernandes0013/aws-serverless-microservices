@@ -34,10 +34,10 @@ export async function createBasketController(params) {
   }
 }
 
-export async function checkoutBasketController({ username }) {
+export async function checkoutBasketController(params) {
   try {
-    const res = await basketService.checkoutBasket(username);
-    console.log(`Basket #${username} checkout`);
+    const res = await basketService.checkoutBasket(params);
+    console.log(`Basket #${params.username} checkout`);
     console.table(res);
     return responseHandler.successResponse(res);
   } catch (error) {

@@ -10,11 +10,13 @@ import * as path from "path";
 interface SwnMicroserviceProps {
   productTable: ITable;
   basketTable: ITable;
+  orderTable: ITable;
 }
 
 interface Microservices {
   productFunction: IFunction;
   basketFunction: IFunction;
+  orderFunction: IFunction
 }
 
 export class SwnMicroservice extends Construct {
@@ -27,21 +29,27 @@ export class SwnMicroservice extends Construct {
   private readonly basketFunctionName = 'basketLambdaFunction';
   public readonly basketFunction: IFunction;
 
+  // order microservice 
+  private readonly orderFunctionName = 'orderLambdaFunction';
+  public readonly orderFunction: IFunction;
+
   constructor(scope: Construct, id: string, props: SwnMicroserviceProps) {
     super(scope, id);
 
     ({ 
       productFunction: this.productFunction,
-      basketFunction: this.basketFunction
+      basketFunction: this.basketFunction,
+      orderFunction: this.orderFunction
     } = this.createMicroservices(props));
   }
 
   private createMicroservices(props: SwnMicroserviceProps): Microservices {
     return {
         productFunction: this.createProductMicroservice(props.productTable),
-        basketFunction: this.createBasketMicroservice(props.basketTable)
+        basketFunction: this.createBasketMicroservice(props.basketTable),
+        orderFunction: this.createOrderMicroservice(props.orderTable)
     };
-}
+  }
 
   private createProductMicroservice(productTable: ITable): IFunction {
     const nodeJsFunctionProps: NodejsFunctionProps = {
@@ -72,7 +80,9 @@ export class SwnMicroservice extends Construct {
       },
       environment: {
         PRIMARY_KEY: "username",
-        DYNAMODB_TABLE_NAME: basketTable.tableName
+        SOURCE: "com.swn.basket.checkoutBasket",
+        DETAIL_TYPE: 'CheckoutBasket',
+        EVENT_BUS_NAME: 'SwnEventBus'
       },
       runtime: Runtime.NODEJS_22_X
     };
@@ -85,5 +95,28 @@ export class SwnMicroservice extends Construct {
     basketTable.grantReadWriteData(basketFunction);
 
     return basketFunction
+  }
+
+  private createOrderMicroservice(orderTable: ITable): IFunction {
+    const nodeJsFunctionProps: NodejsFunctionProps = {
+      bundling: {
+        externalModules: ["aws-sdk"]
+      },
+      environment: {
+        PRIMARY_KEY: "username",
+        SORT_KEY: "orderDate",
+        DYNAMODB_TABLE_NAME: orderTable.tableName
+      },
+      runtime: Runtime.NODEJS_22_X
+    };
+
+    const orderFunction = new NodejsFunction(this, this.orderFunctionName, {
+      entry: path.join(__dirname, "/../src/order/index.js"),
+      ...nodeJsFunctionProps
+    });
+
+    orderTable.grantReadWriteData(orderFunction);
+
+    return orderFunction
   }
 }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { SwnDatabase } from "./database";
@@ -12,25 +11,28 @@ export class AwsMicroservicesStack extends cdk.Stack {
 
     const { 
       productTable, 
-      basketTable 
+      basketTable,
+      orderTable
     } = new SwnDatabase(this, "Database");
 
     const { 
       productFunction, 
-      basketFunction
+      basketFunction,
+      orderFunction
     } = new SwnMicroservice(this, "Microservices", {
-      productTable, basketTable
+      productTable, basketTable, orderTable
     }); 
 
     new SwnApiGateway(this, 'ApiGateways', {
       productFunction,
-      basketFunction
+      basketFunction,
+      orderFunction
     }) 
 
     new SwnEventBus(this, 'EventBuses', {
       checkoutBus: {
         publisherFunction: basketFunction,
-        targetFunction: (() => {}) as any
+        targetFunction: orderFunction
       }
     })
   }

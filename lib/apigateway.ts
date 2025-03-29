@@ -5,11 +5,13 @@ import { Construct } from "constructs";
 interface SwnApiGatewayProps {
   productFunction: IFunction;
   basketFunction: IFunction;
+  orderFunction: IFunction;
 }
 
 interface ApiGateways {
   productApiGateway: IRestApi;
   basketApiGateway: IRestApi;
+  orderApiGateway: IRestApi;
 }
 
 export class SwnApiGateway extends Construct {
@@ -22,19 +24,25 @@ export class SwnApiGateway extends Construct {
   private readonly basketApiGatewayName = 'Basket API';
   public readonly basketApiGateway: IRestApi;
 
+  // order api 
+  private readonly orderApiGatewayName = 'Order API';
+  public readonly orderApiGateway: IRestApi;
+
   constructor(scope: Construct, id: string, props: SwnApiGatewayProps) {
     super(scope, id);
 
     ({ 
       productApiGateway: this.productApiGateway,
-      basketApiGateway: this.basketApiGateway 
+      basketApiGateway: this.basketApiGateway,
+      orderApiGateway: this.orderApiGateway 
     } = this.createApiGateways(props));
   }
 
   private createApiGateways(props: SwnApiGatewayProps): ApiGateways {
     return {
       productApiGateway: this.createProductApiGateway(props.productFunction),
-      basketApiGateway: this.createBasketApiGateway(props.basketFunction)
+      basketApiGateway: this.createBasketApiGateway(props.basketFunction),
+      orderApiGateway: this.createOrderApiGateway(props.orderFunction)
     };
   }
 
@@ -107,5 +115,31 @@ export class SwnApiGateway extends Construct {
     basketCheckoutResource.addMethod("POST"); // POST basket/checkout
     
     return basketApiGateway
+  }
+
+  private createOrderApiGateway(orderFunction: IFunction): IRestApi {
+    // order
+    // GET /order
+
+    // order/{username}
+    // GET order/{username}
+
+    const orderApiGateway = new LambdaRestApi(
+      this, 
+      this.orderApiGatewayName, 
+      {
+        restApiName: this.orderApiGatewayName,
+        handler: orderFunction,
+        proxy: false
+      }
+    );
+
+    const orderResources = orderApiGateway.root.addResource("order");
+    orderResources.addMethod("GET"); // GET /order
+
+    const orderResource = orderResources.addResource("{username}");
+    orderResource.addMethod("GET"); // GET order/{username}
+
+    return orderApiGateway
   }
 }

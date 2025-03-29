@@ -6,6 +6,13 @@ import {
   PutItemCommand,
   ScanCommand
 } from "@aws-sdk/client-dynamodb";
+import { eventBusClient } from "../../eventBus/eventBusClient";
+import { PutEventsCommand } from "@aws-sdk/client-eventbridge";
+import { isEmpty } from "../../utils/utils";
+
+function computeTotalValue(items) {
+  return items.reduce((total, curr) => total + Number(curr.price), 0)
+}
 
 export async function getBasket(username) {
   const input = {
@@ -38,8 +45,35 @@ export async function createBasket(basket) {
   return basket;
 }
 
-export async function checkoutBasket(username) {
-  console.log(username)
+export async function checkoutBasket(request) {
+  if (isEmpty(request.username)) 
+    throw new Error(
+      'Please provide the username in the payload'
+    );
+  const basket = await getBasket(request.username)
+  if (isEmpty(basket?.items || basket)) 
+    throw new Error(
+      'Either the basket doesnt exist or there is no items to checkout'
+    );
+
+  const totalToPay = computeTotalValue(basket.items) 
+  Object.assign(basket, { totalToPay })
+
+  await eventBusClient.send(
+    new PutEventsCommand({
+      Entries: [
+        {
+          Source: process.env.SOURCE,
+          Detail: JSON.stringify(basket),
+          DetailType: process.env.DETAIL_TYPE,
+          Resources: [],
+          EventBusName: process.env.EVENT_BUS_NAME 
+        }
+      ]
+    })
+  );
+
+  await deleteBasket(request.username)
 }
 
 export async function deleteBasket(username) {
