@@ -1,5 +1,5 @@
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
-import { ddbClient } from "../db/ddbClient";
+import { ddbClient } from "../../db/ddbClient";
 import {
   DeleteItemCommand,
   GetItemCommand,

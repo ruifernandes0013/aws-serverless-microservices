@@ -6,7 +6,7 @@ import {
   deleteProductController
 } from "./controllers/productController";
 
-import * as responseHandler from "./utils/responseHandler";
+import * as responseHandler from "../utils/responseHandler";
 
 exports.handler = async function (event) {
   try {

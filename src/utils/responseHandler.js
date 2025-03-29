@@ -3,7 +3,7 @@ export const successResponse = (body) => {
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify(body)
   };
 };
 
@@ -13,7 +13,7 @@ export const errorResponse = (error) => {
     statusCode: error.statusCode || 500,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      message: error.message,
-    }),
+      message: error.message
+    })
   };
 };

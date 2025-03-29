@@ -1,10 +1,10 @@
-import * as productService from "../services/productService";
+import * as basketService from "../services/basketService";
 import * as responseHandler from "../../utils/responseHandler";
 
-export async function getAllProductsController() {
+export async function getAllBasketsController() {
   try {
-    const res = await productService.getAllProducts();
-    console.log("All products");
+    const res = await basketService.getAllBaskets();
+    console.log("All Baskets");
     console.table(res);
     return responseHandler.successResponse(res);
   } catch (error) {
@@ -12,10 +12,10 @@ export async function getAllProductsController() {
   }
 }
 
-export async function getProductController(id) {
+export async function getBasketController(username) {
   try {
-    const res = await productService.getProduct(id);
-    console.log(`Product #${id}`);
+    const res = await basketService.getBasket(username);
+    console.log(`Basket #${username}`);
     console.table(res);
     return responseHandler.successResponse(res);
   } catch (error) {
@@ -23,10 +23,10 @@ export async function getProductController(id) {
   }
 }
 
-export async function createProductController(params) {
+export async function createBasketController(params) {
   try {
-    const res = await productService.createProduct(params);
-    console.log("Product created");
+    const res = await basketService.createBasket(params);
+    console.log("Basket created");
     console.table(res);
     return responseHandler.successResponse(res);
   } catch (error) {
@@ -34,10 +34,10 @@ export async function createProductController(params) {
   }
 }
 
-export async function updateProductController(params) {
+export async function checkoutBasketController({ username }) {
   try {
-    const res = await productService.updateProduct(params);
-    console.log("Product updated");
+    const res = await basketService.checkoutBasket(username);
+    console.log(`Basket #${username} checkout`);
     console.table(res);
     return responseHandler.successResponse(res);
   } catch (error) {
@@ -45,10 +45,10 @@ export async function updateProductController(params) {
   }
 }
 
-export async function deleteProductController(id) {
+export async function deleteBasketController(username) {
   try {
-    const res = await productService.deleteProduct(id);
-    console.log(`Product ${id} deleted`);
+    const res = await basketService.deleteBasket(username);
+    console.log(`Basket ${username} deleted`);
     console.table(res);
     return responseHandler.successResponse(res);
   } catch (error) {
